@@ -2,6 +2,7 @@ package dev.example;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.FileSystemDocumentLoader;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -15,28 +16,25 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static dev.langchain4j.data.document.FileSystemDocumentLoader.loadDocument;
 import static dev.langchain4j.model.openai.OpenAiModelName.GPT_3_5_TURBO;
 
-@SpringBootApplication
-public class CustomerSupportApplication {
+@Configuration
+public class AgentConfiguration {
 
     @Bean
-    CustomerSupportAgent customerSupportAgent(ChatLanguageModel chatLanguageModel,
-                                              BookingTools bookingTools,
+    EmployeeBenefitGuide employeeBenefitGuide(ChatLanguageModel chatLanguageModel,
                                               Retriever<TextSegment> retriever) {
-        return AiServices.builder(CustomerSupportAgent.class)
+        return AiServices.builder(EmployeeBenefitGuide.class)
                 .chatLanguageModel(chatLanguageModel)
                 .chatMemory(MessageWindowChatMemory.withMaxMessages(20))
-                .tools(bookingTools)
                 .retriever(retriever)
                 .build();
     }
@@ -68,8 +66,9 @@ public class CustomerSupportApplication {
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
         // 2. Load an example document ("Miles of Smiles" terms of use)
-        Resource resource = resourceLoader.getResource("classpath:miles-of-smiles-terms-of-use.txt");
-        Document document = loadDocument(resource.getFile().toPath());
+            String filePath = "src/main/resources/temp.pdf";
+        Path path = Paths.get(filePath);
+        Document document = FileSystemDocumentLoader.loadDocument(path);
 
         // 3. Split the document into segments 100 tokens each
         // 4. Convert segments into embeddings
@@ -86,7 +85,4 @@ public class CustomerSupportApplication {
         return embeddingStore;
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(CustomerSupportApplication.class, args);
-    }
 }

@@ -5,29 +5,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CustomerSupportApplicationTest {
+class EmployeeBenefitGuideAppTest {
 
     @Autowired
-    CustomerSupportAgent agent;
+    EmployeeBenefitGuide guide;
 
     @Test
-    void should_provide_booking_details_and_explain_why_cancellation_is_not_possible() {
+    void guideThroughTheirBenefitQuestions() {
 
         // Please define API keys in application.properties before running this test.
         // Tip: Use gpt-4 for this example, as gpt-3.5-turbo tends to hallucinate often and invent name and surname.
 
-        interact(agent, "Hi, I forgot when my booking is.");
-        interact(agent, "123-457");
-        interact(agent, "I'm sorry I'm so inattentive today. Klaus Heisler.");
-        interact(agent, "My bad, it's 123-456");
+        interact(guide, "Hi, I employee of kin and carta. I need with deciding which health insurance to use");
+        interact(guide, "I am 35 and very healthy. I like to keep my insurance cost low. Which insurance plan you recommend");
 
-        // Here, information about the cancellation policy is automatically retrieved and injected into the prompt.
-        // Although the LLM sometimes attempts to cancel the booking, it fails to do so and will explain
-        // the reason why the booking cannot be cancelled, based on the injected cancellation policy.
-        interact(agent, "My plans have changed, can I cancel my booking?");
     }
 
-    private static void interact(CustomerSupportAgent agent, String userMessage) {
+    private static void interact(EmployeeBenefitGuide agent, String userMessage) {
         System.out.println("==========================================================================================");
         System.out.println("[User]: " + userMessage);
         System.out.println("==========================================================================================");
